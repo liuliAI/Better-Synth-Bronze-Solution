@@ -1,0 +1,42 @@
+
+#dataset_path: input/pretrain_stage_1/mgm_pretrain_stage_1.jsonl
+#export_path: output/image_captioning_output/res.jsonl
+dataset_path: input/pretrain_stage_1/mgm_pretrain_stage_1.jsonl
+export_path: output/image_caption-TS_output/res.jsonl
+np: 4
+process:
+  - image_captioning_mapper:
+#       hf_img2seq: '/data/liujiqiang/mllm4data/dj_synth_challenge/models/goldsj/qwen-vl'
+      hf_img2seq:  '/data/liujiqiang/mllm4data/dj_synth_challenge/models/goldsj/blip2-opt-2___7b' 
+# You can replace this path to a local downloaded HF model
+      keep_original_sample: false  # we only need the recaptioned captions
+  - words_num_filter:                                       # filter text with number of words out of specific range
+      lang: en                                                # sample in which language
+      tokenization: false                                     # whether to use model to tokenize documents
+      min_num: 4                                             # the min number of filter range
+      max_num: 24                                          # the max number of filter range
+  - word_repetition_filter:                                 # filter text with the word repetition ratio out of specific range
+      lang: en                                                # sample in which language
+      tokenization: false                                     # whether to use model to tokenize documents
+      rep_len: 1                                             # repetition length for word-level n-gram
+      min_ratio: 0.0                                          # the min ratio of filter range
+      max_ratio: 0.3                                          # the max ratio of filter range
+  - image_shape_filter:                                     # filter samples according to the widths and heights of images in them
+      min_width: 335                                          # the min width of width filter range
+      max_width: 769                                         # the max width of width filter range
+      min_height: 335                                         # the min height of height filter range
+      max_height: 769                                        # the max height of height filter range
+      any_or_all: any                                         # keep this sample when any/all images meet the filter condition
+  - image_watermark_filter:                                 # filter samples according to the predicted watermark probabilities of images in them
+      hf_watermark_model: amrul-hzz/watermark_detector        # Huggingface model name for watermark classification
+      prob_threshold: 0.8                                     # the predicted watermark probability threshold for samples, range from 0 to 1. Samples with watermark probability less than this threshold will be kept.
+      any_or_all: any                                         # keep this sample when any/all images meet the filter condition
+  - image_text_similarity_filter:                           # filter samples according to the similarity between image and text.
+      hf_clip: /data/liujiqiang/mllm4data/dj_synth_challenge/models/goldsj/clip-vit-base-patch32                   # name of used Hugging Face clip
+      min_score: 0.3232                                          # the min similarity of filter range
+      max_score: 1.0                                          # the max similarity of filter range
+      horizontal_flip: false                                  # flip image horizontally (left to right).
+      vertical_flip: false                                    # flip image vertically (top to bottom).
+      reduce_mode: avg                                        # reduce mode when one text corresponds to multiple images in a chunk,  must be one of ['avg','max', 'min'].
+      any_or_all: any                                         # keep this sample when any/all images meet the filter condition
+

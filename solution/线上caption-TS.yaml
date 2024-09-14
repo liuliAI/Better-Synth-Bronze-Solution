@@ -1,0 +1,21 @@
+
+#dataset_path: input/pretrain_stage_1/mgm_pretrain_stage_1.jsonl
+#export_path: output/image_captioning_output/res.jsonl
+dataset_path: input/pretrain_stage_1/mgm_pretrain_stage_1.jsonl
+export_path: output/image_caption-TS_output/res.jsonl
+np: 4
+process:
+  - image_captioning_mapper:
+#       hf_img2seq: '/data/liujiqiang/mllm4data/dj_synth_challenge/models/goldsj/qwen-vl'
+      hf_img2seq:  '/data/liujiqiang/mllm4data/dj_synth_challenge/models/goldsj/blip2-opt-2___7b' 
+# You can replace this path to a local downloaded HF model
+      keep_original_sample: false  # we only need the recaptioned captions
+  - image_text_similarity_filter:                           # filter samples according to the similarity between image and text.
+      hf_clip: /data/liujiqiang/mllm4data/dj_synth_challenge/models/goldsj/clip-vit-base-patch32                   # name of used Hugging Face clip
+      min_score: 0.3232                                          # the min similarity of filter range
+      max_score: 1.0                                          # the max similarity of filter range
+      horizontal_flip: false                                  # flip image horizontally (left to right).
+      vertical_flip: false                                    # flip image vertically (top to bottom).
+      reduce_mode: avg                                        # reduce mode when one text corresponds to multiple images in a chunk,  must be one of ['avg','max', 'min'].
+      any_or_all: any                                         # keep this sample when any/all images meet the filter condition
+
