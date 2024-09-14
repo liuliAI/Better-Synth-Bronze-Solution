@@ -75,7 +75,9 @@ Average word count: 10.79
 Maximum image width: 12192
 Minimum image width: 336
 Average image width: 403.1335
+
 ![enter image description here](https://tianchi-public.oss-cn-hangzhou.aliyuncs.com/public/files/forum/172624000503758171726240005037_ac2wj1rqbs.png)
+
 Maximum image height: 3033
 Minimum image height: 336
 Average image height: 367.7052
