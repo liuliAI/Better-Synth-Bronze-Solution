@@ -50,6 +50,7 @@ Better Synth 是一项以数据为中心的挑战赛，考察如何合成与清�
   - <b>图文匹配相似度</b>
  使用CLIP统计一下数据集中图文匹配的相似度直方图分布。
  ![enter image description here](https://tianchi-public.oss-cn-hangzhou.aliyuncs.com/public/files/forum/172623128877543621726231288775_hb36njifnu.jpeg)
+
 Maximum Score: 0.4763159155845642
 Average Score: 0.3232152164191008
 Standard Deviation: 0.03921227440944236
@@ -60,6 +61,7 @@ Standard Deviation: 0.03921227440944236
   简单统计一下文本单词数量直方图分布（由于是英语数据集，我是以空格区分的简单逻辑）
   可以看到，数据集原本caption的总体长度也偏短，因此不进行recapition效果也不会差（由于模型参数量少，Caption越简单越直观越好，不需要图片中其他复杂推理逻辑或其他间接信息）。
   ![enter image description here](https://tianchi-public.oss-cn-hangzhou.aliyuncs.com/public/files/forum/172623158123115971726231581231_fllwxhmdxh.jpeg)
+
 Maximum word count: 23
 Minimum word count: 3
 Average word count: 10.79
@@ -69,6 +71,7 @@ Average word count: 10.79
   由于存在两个异常数据（一个宽为12192，一个高为3033），把数据范围拉大了，而绝大数图片的尺寸是正常的，导致画出来的图不好看。
   ![enter image description here](https://tianchi-public.oss-cn-hangzhou.aliyuncs.com/public/files/forum/172623285697282141726232856972_mecmq0gazl.png)
   ![enter image description here](https://tianchi-public.oss-cn-hangzhou.aliyuncs.com/public/files/forum/172624003140119171726240031401_giauiehhfz.png)
+
 Maximum image width: 12192
 Minimum image width: 336
 Average image width: 403.1335
@@ -81,13 +84,16 @@ Average image height: 367.7052
  2. 组合算子
  由于核心是模态对齐，文本图片更一致的进行训练效果会更好，因此CLIP必不可少。
  在初赛最后一天使用Stable Diffusion进行图片的重新生成效果并不好。
- 使用LLaVA-1.5效果一般，使用prompt：“Please describe the main elements in the image in concise language based on the content. For example, 'A little girl wearing blue clothes is swinging in the park.' Pay attention to maintaining consistency and conciseness in the description, only describe based on the surface content of the image, without delving into the meaning behind the image.”达到2分，但caption仍然较长，可能是prompt设计的还不够好，使用BLIP-2虽然生成的caption虽然看起来不大行，但训练后效果反而还行。
+ 使用LLaVA-1.5效果一般，使用prompt：“Please describe the main elements in the image in concise language based on the content. For example, 'A little girl wearing blue clothes is swinging in the park.' Pay attention to maintaining consistency and conciseness in the description, only describe based on the surface content of the image, without delving into the meaning behind the image.”
+
+达到2分，但caption仍然较长，可能是prompt设计的还不够好，使用BLIP-2虽然生成的caption虽然看起来不大行，但训练后效果反而还行。
  值得注意的是，使用BLIP-2+watermark效果更好，这是因为BLIP-2对于有水印的图片生成的caption会在最后包含不必要的信息stock photo![enter image description here](https://tianchi-public.oss-cn-hangzhou.aliyuncs.com/public/files/forum/172623969726649371726239697266_rvyny5y5cf.jpeg)
 
 使用Aesthetice去除美学评分低的效果不大好，使用NSFW去除暴力、色情图片效果也不大好，Id_score，Grounding_recall，Action num，perplexity score等效果一般
 
 ![enter image description here](https://tianchi-public.oss-cn-hangzhou.aliyuncs.com/public/files/forum/172630001664645271726300016646_7jztugddfz.jpeg)
-通过测量不同算子的运行速度（单位：examples/s），获得最佳顺序，具体方案见GitHub
+
+通过测量不同算子的运行速度（单位：examples/s），获得最佳顺序，具体方案见solution
 
 3. 思路技巧
  - 训练过程并不稳定，一样的设置可能从0.8或者飙升到1.5，因此最好多跑几遍baseline
