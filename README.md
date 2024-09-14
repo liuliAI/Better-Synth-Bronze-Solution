@@ -43,7 +43,9 @@ bash train_mgm_2b_stage_1.sh
   - 推理结果存放于：`output/eval_results`
 
 5.思路
+
 <b><font class=center>赛题</font></b>
+
 Better Synth 是一项以数据为中心的挑战赛，考察如何合成与清洗图文数据以在多模态大模型上取得更优的图片理解能力。在给定的种子数据集的基础上，通过高效的数据合成方法与模型生成出更优的数据，并在给定计算量的约束下，实现对图像理解多模态大模型的高效训练。
 
  <b>1. 数据分析</b>
@@ -51,13 +53,12 @@ Better Synth 是一项以数据为中心的挑战赛，考察如何合成与清�
  使用CLIP统计一下数据集中图文匹配的相似度直方图分布。
  ![enter image description here](https://tianchi-public.oss-cn-hangzhou.aliyuncs.com/public/files/forum/172623128877543621726231288775_hb36njifnu.jpeg)
 
+'''
 Maximum Score: 0.4763159155845642
-
 Average Score: 0.3232152164191008
-
 Standard Deviation: 0.03921227440944236
-
 3 sigma 区间: (0.2055783931907737, 0.44085203964742786)
+'''
 
 在这里使用K-sigma 进行异常点之外的过滤效果不太理想，把平均值0.3232以下的低质量，图文相关性不大的数据集进行过滤是比较work的。
 
@@ -66,33 +67,30 @@ Standard Deviation: 0.03921227440944236
   可以看到，数据集原本caption的总体长度也偏短，因此不进行recapition效果也不会差（由于模型参数量少，Caption越简单越直观越好，不需要图片中其他复杂推理逻辑或其他间接信息）。
   ![enter image description here](https://tianchi-public.oss-cn-hangzhou.aliyuncs.com/public/files/forum/172623158123115971726231581231_fllwxhmdxh.jpeg)
 
+'''
 Maximum word count: 23
-
 Minimum word count: 3
-
 Average word count: 10.79
-
 标准差: 3.52
-  
+'''
+
   - <b>图片尺寸分析</b>
   由于存在两个异常数据（一个宽为12192，一个高为3033），把数据范围拉大了，而绝大数图片的尺寸是正常的，导致画出来的图不好看。
   ![enter image description here](https://tianchi-public.oss-cn-hangzhou.aliyuncs.com/public/files/forum/172623285697282141726232856972_mecmq0gazl.png)
   ![enter image description here](https://tianchi-public.oss-cn-hangzhou.aliyuncs.com/public/files/forum/172624003140119171726240031401_giauiehhfz.png)
-
+'''
 Maximum image width: 12192
-
 Minimum image width: 336
-
 Average image width: 403.1335
+'''
 
 ![enter image description here](https://tianchi-public.oss-cn-hangzhou.aliyuncs.com/public/files/forum/172624000503758171726240005037_ac2wj1rqbs.png)
 
+'''
 Maximum image height: 3033
-
 Minimum image height: 336
-
 Average image height: 367.7052
-
+'''
 由于本次比赛基于[Mini-Gemini](https://github.com/dvlab-research/MGM?spm=a2c22.12281978.0.0.376b2c2bOxjWmv)进行训练，而该模型与训练的像素大小为336，CLIP预训练的像素大小为768，因此我们选择将图片像素小于336大于768的进行去除。
  
  2. 组合算子
@@ -113,5 +111,19 @@ Average image height: 367.7052
  - 训练过程并不稳定，一样的设置可能从0.8或者飙升到1.5，因此最好多跑几遍baseline
  -  数据量对模型能力提升有很大帮助，因此清洗筛选完最好进行补充或者重复，达到约束的上限量
  -  高质量重复数据对模型有很大帮助，我们的最佳成绩重复了3.76次（在toolkit/training/preprocess/check_sample_number.py代码进行修改，使用while循环和random.sample进行随机采样，补充至上限）
+'''
+代码样例如下：
+            if sample_num < len(ds):
+                logger.info(f'Sampled number from the input dataset: {sample_num}')
+                sampled_ds = random.sample(ds, sample_num)
+            else:
+                logger.info(f'Need to sample more than the input dataset size.')
+                sampled_ds = []
+                while len(sampled_ds) < sample_num:
+                    num_to_sample = min(sample_num - len(sampled_ds), len(ds))
+                    sampled_ds.extend(random.sample(ds, num_to_sample))
+                logger.info(f'Sampled number from the input dataset: {sample_num}')
+            writer.write_all(sampled_ds)
+'''
  - 不同算子顺序导致的结果有一定区别，包括速度也不一样，优先使用轻量级算子更快，但若是考虑模型精度，可以思考先cation再过滤还是先过滤再caption的区别。或者使用 <b>清洗数据→合成数据→清洗数据</b> 的方式
  - 数据多样性很重要
