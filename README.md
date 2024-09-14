@@ -52,9 +52,13 @@ Better Synth 是一项以数据为中心的挑战赛，考察如何合成与清�
  ![enter image description here](https://tianchi-public.oss-cn-hangzhou.aliyuncs.com/public/files/forum/172623128877543621726231288775_hb36njifnu.jpeg)
 
 Maximum Score: 0.4763159155845642
+
 Average Score: 0.3232152164191008
+
 Standard Deviation: 0.03921227440944236
+
 3 sigma 区间: (0.2055783931907737, 0.44085203964742786)
+
 在这里使用K-sigma 进行异常点之外的过滤效果不太理想，把平均值0.3232以下的低质量，图文相关性不大的数据集进行过滤是比较work的。
 
   - <b>文字长度分析</b>
@@ -63,8 +67,11 @@ Standard Deviation: 0.03921227440944236
   ![enter image description here](https://tianchi-public.oss-cn-hangzhou.aliyuncs.com/public/files/forum/172623158123115971726231581231_fllwxhmdxh.jpeg)
 
 Maximum word count: 23
+
 Minimum word count: 3
+
 Average word count: 10.79
+
 标准差: 3.52
   
   - <b>图片尺寸分析</b>
@@ -73,14 +80,19 @@ Average word count: 10.79
   ![enter image description here](https://tianchi-public.oss-cn-hangzhou.aliyuncs.com/public/files/forum/172624003140119171726240031401_giauiehhfz.png)
 
 Maximum image width: 12192
+
 Minimum image width: 336
+
 Average image width: 403.1335
 
 ![enter image description here](https://tianchi-public.oss-cn-hangzhou.aliyuncs.com/public/files/forum/172624000503758171726240005037_ac2wj1rqbs.png)
 
 Maximum image height: 3033
+
 Minimum image height: 336
+
 Average image height: 367.7052
+
 由于本次比赛基于[Mini-Gemini](https://github.com/dvlab-research/MGM?spm=a2c22.12281978.0.0.376b2c2bOxjWmv)进行训练，而该模型与训练的像素大小为336，CLIP预训练的像素大小为768，因此我们选择将图片像素小于336大于768的进行去除。
  
  2. 组合算子
